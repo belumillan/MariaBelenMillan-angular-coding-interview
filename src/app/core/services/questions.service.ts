@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { QuestionModel } from '../state/question.model';
 import { QuestionsStore } from '../state/questions.store';
-import { map, pluck, tap } from 'rxjs/operators';
+import { catchError, map, pluck, tap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -25,6 +25,10 @@ export class QuestionsService {
     }));
 
     return this.http.get<{ results: any[] }>('https://opentdb.com/api.php', { params })
+      .pipe(catchError(err => {
+        debugger
+        throw 'error in API. Details: ' + err.message;
+      }))
       .pipe(pluck('results'))
       .pipe(map(results => {
         return results.map(result => ({
